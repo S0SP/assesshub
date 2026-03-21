@@ -16,8 +16,11 @@ export default async function PublicTestPage({ params }: { params: { shareCode: 
   const session = await auth();
   let existingAttempt = null;
   if (session && (session.user as any).role === "TEST_TAKER") {
-    existingAttempt = await prisma.testAttempt.findUnique({
-      where: { testId_userId: { testId: test.id, userId: (session.user as any).id } },
+    // Use findFirst (not findUnique) since @@unique([testId, userId]) was removed
+    // to support multiple attempts. Get the most recent attempt.
+    existingAttempt = await prisma.testAttempt.findFirst({
+      where: { testId: test.id, userId: (session.user as any).id },
+      orderBy: { createdAt: "desc" },
     });
   }
 

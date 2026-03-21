@@ -11,8 +11,10 @@ async function ask(prompt: string): Promise<string> {
 
   if (!key) throw new Error("GEMINI_API_KEY not set");
 
+  // Changed from gemini-1.5-flash (deprecated) to gemini-2.5-flash (current)
+  // Changed v1beta to v1 for long-term stability
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${key}`,
     {
       method: "POST",
       headers: {
@@ -31,11 +33,12 @@ async function ask(prompt: string): Promise<string> {
   if (!res.ok) {
     const err = await res.text();
     console.error("Gemini API Error:", err);
-    throw new Error("Gemini request failed");
+    throw new Error(`Gemini request failed: ${res.status}`);
   }
 
   const data = await res.json();
 
+  // Updated optional chaining to safely extract the text response
   return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 }
 

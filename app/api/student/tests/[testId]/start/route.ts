@@ -27,28 +27,39 @@ export async function POST(req: Request, { params }: { params: { testId: string 
     return NextResponse.json({ error: "Incorrect password" }, { status: 403 });
   }
 
-  const existing = await prisma.testAttempt.findUnique({
-    where: { testId_userId: { testId: params.testId, userId: u.id } },
-  });
-  const allowMultiple = (test.settings as any)?.allow_multiple_attempts;
-  const shouldRandomize = (test.settings as any)?.randomize_questions === true;
+  const settings = test.settings as any;
+  const allowMultiple = settings?.allow_multiple_attempts === true;
+  const shouldRandomize = settings?.randomize_questions === true;
 
-  if (existing) {
-    if (existing.status === "IN_PROGRESS") {
+  // Find the most recent attempt (IN_PROGRESS or SUBMITTED)
+  const latestAttempt = await prisma.testAttempt.findFirst({
+    where: { testId: params.testId, userId: u.id },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (latestAttempt) {
+    // Resume an in-progress attempt regardless of allowMultiple
+    if (latestAttempt.status === "IN_PROGRESS") {
       let safeQs = test.questions.map(({ correctOption: _c, keywords: _k, modelAnswer: _m, ...q }) => q);
       if (shouldRandomize) safeQs = shuffleArray(safeQs);
       return NextResponse.json({
-        attemptId: existing.id,
+        attemptId: latestAttempt.id,
         questions: safeQs,
-        answers: existing.answers,
-        startedAt: existing.startedAt,
+        answers: latestAttempt.answers,
+        startedAt: latestAttempt.startedAt,
         duration: test.duration,
         test: { title: test.title, settings: test.settings },
       });
     }
-    if (!allowMultiple) return NextResponse.json({ error: "Already attempted this test" }, { status: 400 });
+
+    // Latest attempt is SUBMITTED — check if re-attempt is allowed
+    if (!allowMultiple) {
+      return NextResponse.json({ error: "You have already completed this test. Multiple attempts are not allowed." }, { status: 400 });
+    }
+    // allowMultiple = true → fall through to create a new attempt
   }
 
+  // Create a new attempt
   const maxScore = test.questions.reduce((sum: number, q: { points: number }) => sum + q.points, 0);
   const attempt = await prisma.testAttempt.create({
     data: { testId: params.testId, userId: u.id, maxScore },
@@ -56,6 +67,7 @@ export async function POST(req: Request, { params }: { params: { testId: string 
 
   let safeQs = test.questions.map(({ correctOption: _c, keywords: _k, modelAnswer: _m, ...q }) => q);
   if (shouldRandomize) safeQs = shuffleArray(safeQs);
+
   return NextResponse.json({
     attemptId: attempt.id,
     questions: safeQs,

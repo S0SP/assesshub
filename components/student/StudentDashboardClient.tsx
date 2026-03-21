@@ -62,8 +62,8 @@ export default function StudentDashboardClient({
     setLoadingMore(false);
   };
 
-  const startTest = async (test: any) => {
-    if (test.userAttempt?.status === "SUBMITTED") { router.push(`/results/${test.userAttempt.id}`); return; }
+  const attemptTest = async (test: any) => {
+    // Always go to start API — it handles resume, re-attempt, and fresh start
     if (test.userAttempt?.status === "IN_PROGRESS") { router.push(`/test-attempt/${test.id}`); return; }
     if (test.accessType === "PASSWORD_PROTECTED") {
       const pw = prompt("Enter test password:");
@@ -166,14 +166,21 @@ export default function StudentDashboardClient({
                       </div>
                       <div className="flex-shrink-0">
                         {test.userAttempt?.status === "SUBMITTED" ? (
-                          <div className="text-right">
+                          <div className="text-right space-y-1">
                             <div className={`font-mono text-lg font-bold ${test.userAttempt.percentage >= 70 ? "text-green-600" : test.userAttempt.percentage >= 40 ? "text-amber-600" : "text-[#D63229]"}`}>
                               {Math.round(test.userAttempt.percentage)}%
                             </div>
-                            <Link href={`/results/${test.userAttempt.id}`} className="text-xs text-[#1A2E44] hover:underline">View Results</Link>
+                            <Link href={`/results/${test.userAttempt.id}`} className="text-xs text-[#1A2E44] hover:underline block">View Results</Link>
+                            {(test.settings as any)?.allow_multiple_attempts && (
+                              <button onClick={() => attemptTest(test)} disabled={starting === test.id}
+                                className="text-xs text-[#5C5C59] hover:text-[#1A2E44] border border-[#E0DFDB] px-2 py-1 rounded-sm transition-colors flex items-center gap-1 ml-auto">
+                                {starting === test.id ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                                Re-attempt
+                              </button>
+                            )}
                           </div>
                         ) : (
-                          <button onClick={() => startTest(test)} disabled={starting === test.id}
+                          <button onClick={() => attemptTest(test)} disabled={starting === test.id}
                             className={`btn-primary flex items-center gap-1.5 ${test.userAttempt?.status === "IN_PROGRESS" ? "bg-amber-500 hover:bg-amber-600" : ""}`}>
                             {starting === test.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
                             {test.userAttempt?.status === "IN_PROGRESS" ? "Resume" : "Start Test"}

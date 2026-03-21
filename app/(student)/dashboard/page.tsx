@@ -20,15 +20,23 @@ export default async function StudentDashboard() {
   const hasMore = tests.length > PAGE_SIZE;
   const page = tests.slice(0, PAGE_SIZE);
 
+  // Get ALL attempts for this user, ordered newest first
   const attempts = await prisma.testAttempt.findMany({
     where: { userId },
     include: { test: { select: { title: true, duration: true } } },
     orderBy: { createdAt: "desc" },
   });
 
-  const attemptMap = Object.fromEntries(
-    attempts.map((a: typeof attempts[0]) => [a.testId, { id: a.id, status: a.status, percentage: a.percentage }])
-  );
+  // For each test, keep only the most recent attempt (newest first due to ordering)
+  const attemptMap: Record<string, { id: string; status: string; percentage: number }> = {};
+  for (const a of attempts) {
+    // First occurrence = most recent (because ordered by createdAt desc)
+    if (!attemptMap[a.testId]) {
+      attemptMap[a.testId] = { id: a.id, status: a.status, percentage: a.percentage };
+    }
+  }
+
+  // Results = all submitted attempts (for the My Results tab)
   const results = attempts
     .filter((a: typeof attempts[0]) => a.status === "SUBMITTED")
     .map((a: typeof attempts[0]) => ({ ...a, testTitle: a.test.title }));

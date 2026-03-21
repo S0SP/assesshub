@@ -222,6 +222,22 @@ export default function TestResultsClient({
               </div>
               <button onClick={() => setReviewing(null)} className="text-[#5C5C59] hover:text-[#111110] text-lg">✕</button>
             </div>
+            {/* Release banner when show_results_immediately is OFF */}
+            {reviewing && !(test.settings as any)?.show_results_immediately && !(reviewing.evaluation?._released) && (
+              <div className="mx-6 mt-4 p-3 bg-amber-50 border border-amber-200 rounded-sm flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-amber-800">Results hidden from student</p>
+                  <p className="text-xs text-amber-700 mt-0.5">Reviewing this attempt will automatically release results to the student.</p>
+                </div>
+                <span className="text-[10px] bg-amber-200 text-amber-900 px-2 py-1 rounded-sm font-medium whitespace-nowrap ml-3">Auto-released on open</span>
+              </div>
+            )}
+            {reviewing && reviewing.evaluation?._released && !(test.settings as any)?.show_results_immediately && (
+              <div className="mx-6 mt-4 p-3 bg-green-50 border border-green-200 rounded-sm">
+                <p className="text-xs font-medium text-green-800">✓ Results released to student</p>
+                <p className="text-xs text-green-700 mt-0.5">Released on {reviewing.evaluation._releasedAt ? new Date(reviewing.evaluation._releasedAt).toLocaleString() : "review"}</p>
+              </div>
+            )}
             <div className="overflow-y-auto flex-1 p-6 space-y-4">
               {questions.map((q, i) => {
                 const ev = (reviewing.evaluation || {})[q.id] || {};

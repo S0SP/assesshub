@@ -155,7 +155,7 @@ model TestAttempt {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  @@unique([testId, userId])
+  // Multiple attempts allowed — no unique constraint
   @@map("test_attempts")
 }
 

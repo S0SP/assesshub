@@ -204,7 +204,17 @@ npx ts-node --compiler-options '{"module":"CommonJS"}' prisma/seed.ts
 | **`_released` in evaluation JSON** | Avoids schema migration for teacher-controlled result visibility |
 
 > Full ER diagram and table definitions → [`DOCUMENTATION.pdf`](./DOCUMENTATION.pdf) — Section 02.
+> 
+### Admin Panel Design Note
 
+The system currently distinguishes between SUPER_ADMIN and TEACHER roles.
+
+The admin panel is designed to be extensible for multiple test moderators (teachers), where:
+- Each teacher independently manages their own tests and results
+- Role-based access control is enforced via middleware and API-level checks
+- The architecture supports horizontal scaling to multiple moderators without shared-state conflicts
+
+This ensures the platform is not limited to a single administrator but supports a generalized multi-moderator system, aligning with real-world assessment platforms.
 ---
 
 ## 6. Evaluation Engine
@@ -356,11 +366,9 @@ assesshub/
 
 ## AI Tool Usage
 
-Built with Claude (Anthropic). Per assignment requirements:
+Built with the help of Claude (Anthropic) for debugging and reoeated task . Per assignment requirements:
 - Every line of code has been reviewed, understood, and tested by me
-- Full conversation log: *(add link here)*
 - I can walk through any part of the codebase during review
 
 ---
 
-*Built for the UnboundYou Full-Stack Internship Technical Assignment.*

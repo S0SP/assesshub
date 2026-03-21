@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 40 7% 97%; --foreground: 60 6% 7%;
+    --card: 0 0% 100%; --card-foreground: 60 6% 7%;
+    --primary: 210 43% 18%; --primary-foreground: 0 0% 98%;
+    --secondary: 30 10% 87%; --secondary-foreground: 60 6% 7%;
+    --muted: 40 5% 92%; --muted-foreground: 60 2% 36%;
+    --accent: 4 70% 50%; --accent-foreground: 0 0% 100%;
+    --destructive: 4 70% 50%; --destructive-foreground: 0 0% 98%;
+    --border: 40 5% 86%; --input: 40 5% 86%; --ring: 210 43% 18%;
+    --radius: 0.125rem;
+    --popover: 0 0% 100%; --popover-foreground: 60 6% 7%;
+  }
+  * { @apply border-border; box-sizing: border-box; }
+  body { @apply bg-[#F7F7F5] text-[#111110]; font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif; -webkit-font-smoothing: antialiased; }
+  h1,h2,h3,h4,h5,h6 { font-family: 'Manrope', sans-serif; }
+  code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+}
+
+@layer components {
+  .font-display { font-family: 'Playfair Display', serif; }
+  .font-heading { font-family: 'Manrope', sans-serif; }
+  .nav-link { @apply text-sm text-[#5C5C59] hover:text-[#111110] transition-colors duration-150; }
+  .btn-primary { @apply bg-[#1A2E44] hover:bg-[#2C4A6B] text-white text-sm font-medium px-4 py-2.5 transition-colors duration-150 rounded-sm; }
+  .btn-outline { @apply border border-[#E0DFDB] bg-white hover:bg-[#F7F7F5] text-[#111110] text-sm font-medium px-4 py-2.5 transition-colors duration-150 rounded-sm; }
+  .card { @apply bg-white border border-[#E0DFDB]; }
+  .input-base { @apply h-11 bg-white border-[#E0DFDB] rounded-sm text-sm focus:ring-1 focus:ring-[#1A2E44] focus:border-[#1A2E44] outline-none w-full px-3; }
+  .label { @apply text-xs font-medium text-[#5C5C59] uppercase tracking-wider block mb-1.5; }
+  .badge { @apply inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded-sm; }
+  .badge-green { @apply bg-green-100 text-green-800; }
+  .badge-amber { @apply bg-amber-100 text-amber-800; }
+  .badge-gray { @apply bg-gray-100 text-gray-600; }
+  .badge-red { @apply bg-red-100 text-red-800; }
+  .badge-navy { @apply bg-[#1A2E44]/10 text-[#1A2E44]; }
+  .stat-box { @apply p-5 bg-white border-r border-[#E0DFDB] last:border-r-0; }
+  .tab-btn { @apply px-4 py-2.5 text-sm font-medium border-b-2 transition-colors duration-150; }
+  .tab-active { @apply border-[#1A2E44] text-[#1A2E44]; }
+  .tab-inactive { @apply border-transparent text-[#5C5C59] hover:text-[#111110]; }
+  .q-nav-item { @apply w-9 h-9 flex items-center justify-center border border-[#E0DFDB] font-mono text-xs cursor-pointer transition-colors duration-100 rounded-sm; }
+  .q-nav-answered { @apply bg-green-500 text-white border-green-500; }
+  .q-nav-current { @apply bg-[#1A2E44] text-white border-[#1A2E44]; }
+  .q-nav-flagged { @apply bg-amber-400 text-[#111110] border-amber-400; }
+  .q-nav-unanswered { @apply bg-white text-[#5C5C59]; }
+}
+
+.timer-warning { animation: timer-pulse 1s ease-in-out infinite; }
+.progress-bar { height: 2px; background: #1A2E44; position: fixed; top: 0; left: 0; z-index: 100; transition: width 0.3s ease; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #F7F7F5; }
+::-webkit-scrollbar-thumb { background: #C5C5C0; }
+::-webkit-scrollbar-thumb:hover { background: #A0A09A; }
+*:focus-visible { outline: 2px solid #1A2E44; outline-offset: 2px; }

@@ -1,0 +1,194 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  TEACHER
+  TEST_TAKER
+}
+
+enum TestStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  CLOSED
+}
+
+enum AccessType {
+  PUBLIC
+  INVITE_ONLY
+  PASSWORD_PROTECTED
+}
+
+enum QuestionType {
+  MCQ
+  SHORT_ANSWER
+  LONG_ANSWER
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+}
+
+enum InviteStatus {
+  ACTIVE
+  USED
+  EXPIRED
+  REVOKED
+}
+
+enum CodeStatus {
+  ACTIVE
+  EXHAUSTED
+  EXPIRED
+  REVOKED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(TEST_TAKER)
+  department   String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tests              Test[]
+  attempts           TestAttempt[]
+  teacherInvitesMade TeacherInvite[]  @relation("InviteCreator")
+  teacherInviteUsed  TeacherInvite?   @relation("InviteUser")
+  testCodesCreated   TestInviteCode[]
+  codeUsages         TestInviteUsage[]
+
+  @@map("users")
+}
+
+model TeacherInvite {
+  id          String       @id @default(cuid())
+  code        String       @unique
+  department  String?
+  status      InviteStatus @default(ACTIVE)
+  expiresAt   DateTime
+  createdAt   DateTime     @default(now())
+
+  createdById String
+  createdBy   User         @relation("InviteCreator", fields: [createdById], references: [id])
+
+  usedById    String?      @unique
+  usedBy      User?        @relation("InviteUser", fields: [usedById], references: [id])
+  usedAt      DateTime?
+
+  @@map("teacher_invites")
+}
+
+model Test {
+  id           String     @id @default(cuid())
+  title        String
+  description  String     @default("")
+  duration     Int        @default(30)
+  category     String     @default("General")
+  accessType   AccessType @default(PUBLIC)
+  testPassword String?
+  shareCode    String     @unique
+  status       TestStatus @default(DRAFT)
+  settings     Json       @default("{}")
+  totalPoints  Float      @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  createdById String
+  createdBy   User        @relation(fields: [createdById], references: [id])
+
+  questions   Question[]
+  attempts    TestAttempt[]
+  inviteCodes TestInviteCode[]
+
+  @@map("tests")
+}
+
+model Question {
+  id            String       @id @default(cuid())
+  type          QuestionType
+  text          String
+  options       Json?
+  correctOption String?
+  keywords      Json?
+  points        Float        @default(1)
+  tags          String[]     @default([])
+  explanation   String?
+  modelAnswer   String?
+  order         Int          @default(0)
+  createdAt     DateTime     @default(now())
+
+  testId String
+  test   Test   @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  @@map("questions")
+}
+
+model TestAttempt {
+  id               String        @id @default(cuid())
+  status           AttemptStatus @default(IN_PROGRESS)
+  answers          Json          @default("{}")
+  evaluation       Json          @default("{}")
+  totalScore       Float         @default(0)
+  maxScore         Float         @default(0)
+  percentage       Float         @default(0)
+  timeTakenSeconds Int           @default(0)
+  startedAt        DateTime      @default(now())
+  submittedAt      DateTime?
+  createdAt        DateTime      @default(now())
+
+  testId String
+  test   Test   @relation(fields: [testId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([testId, userId])
+  @@map("test_attempts")
+}
+
+model TestInviteCode {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  label       String?
+  maxUses     Int        @default(50)
+  currentUses Int        @default(0)
+  expiresAt   DateTime
+  status      CodeStatus @default(ACTIVE)
+  createdAt   DateTime   @default(now())
+
+  testId      String
+  test        Test       @relation(fields: [testId], references: [id], onDelete: Cascade)
+
+  createdById String
+  createdBy   User       @relation(fields: [createdById], references: [id])
+
+  usages TestInviteUsage[]
+
+  @@map("test_invite_codes")
+}
+
+model TestInviteUsage {
+  id     String   @id @default(cuid())
+  usedAt DateTime @default(now())
+
+  inviteCodeId String
+  inviteCode   TestInviteCode @relation(fields: [inviteCodeId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@map("test_invite_usages")
+}

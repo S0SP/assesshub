@@ -8,7 +8,7 @@
 [![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)](https://vercel.com)
 
 **Live Demo:** [https://assesshub.vercel.app](https://assesshub.vercel.app)  
-**Documentation:** [`DOCUMENTATION.pdf`](./DOCUMENTATION.pdf)
+**Documentation:** [`DOCUMENTATION.pdf`](https://drive.google.com/file/d/1F4mrlCsfUSp4BddE3xQTxYMkXUIJZ1yl/view?usp=sharing)
 
 ---
 

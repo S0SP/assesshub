@@ -7,9 +7,20 @@ function getClient() {
 }
 
 async function ask(prompt: string): Promise<string> {
-  const client = getClient();
-  const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const key = process.env.GEMINI_API_KEY;
+
+  console.log("API KEY EXISTS:", !!key); // 🔥 DEBUG LINE
+
+  if (!key) throw new Error("GEMINI_API_KEY not set");
+
+  const client = new GoogleGenerativeAI(key);
+
+  const model = client.getGenerativeModel({
+    model: "gemini-1.5-flash-latest", // ✅ safer
+  });
+
   const result = await model.generateContent(prompt);
+
   return result.response.text().trim();
 }
 

@@ -9,19 +9,34 @@ function getClient() {
 async function ask(prompt: string): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
 
-  console.log("API KEY EXISTS:", !!key); // 🔥 DEBUG LINE
-
   if (!key) throw new Error("GEMINI_API_KEY not set");
 
-  const client = new GoogleGenerativeAI(key);
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${key}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [{ text: prompt }],
+          },
+        ],
+      }),
+    }
+  );
 
-  const model = client.getGenerativeModel({
-    model: "gemini-1.5-flash-latest", // ✅ safer
-  });
+  if (!res.ok) {
+    const err = await res.text();
+    console.error("Gemini API Error:", err);
+    throw new Error("Gemini request failed");
+  }
 
-  const result = await model.generateContent(prompt);
+  const data = await res.json();
 
-  return result.response.text().trim();
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 }
 
 function parseJSON<T>(text: string, fallback: T): T {

@@ -84,6 +84,27 @@ export default function TestResultsClient({
     setSaving(false);
   };
 
+  // Calls GET /api/teacher/results/[id] which auto-releases results to the student
+  const openReview = async (attempt: any) => {
+    try {
+      const res = await fetch(`/api/teacher/results/${attempt.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        // Use fresh data from server (includes _released flag written by the GET handler)
+        setReviewing({ ...data.attempt, userName: data.attempt.userName || attempt.userName, userEmail: data.attempt.userEmail || attempt.userEmail });
+        // Update the attempt in list to reflect any changes
+        setAttempts(prev => prev.map(a => a.id === attempt.id ? { ...a, evaluation: data.attempt.evaluation } : a));
+      } else {
+        // Fallback: open with existing data but still release via a direct update
+        await fetch(`/api/teacher/results/${attempt.id}/release`, { method: "POST" });
+        setReviewing(attempt);
+      }
+    } catch {
+      // Fallback if API fails
+      setReviewing(attempt);
+    }
+  };
+
   const SortBtn = ({ col, label }: { col: string; label: string }) => (
     <button onClick={() => handleSort(col)} className="flex items-center gap-1 group">
       {label}
@@ -181,7 +202,7 @@ export default function TestResultsClient({
                       <td className="px-5 py-3 font-mono text-xs">{Math.floor(a.timeTakenSeconds / 60)}m{a.timeTakenSeconds % 60}s</td>
                       <td className="px-5 py-3 text-xs text-[#5C5C59]">{a.submittedAt ? new Date(a.submittedAt).toLocaleString() : "—"}</td>
                       <td className="px-5 py-3">
-                        <button onClick={() => setReviewing(a)} className="text-xs text-[#1A2E44] hover:underline flex items-center gap-1">
+                        <button onClick={() => openReview(a)} className="text-xs text-[#1A2E44] hover:underline flex items-center gap-1">
                           <Eye className="w-3.5 h-3.5" strokeWidth={1.5} /> Review
                         </button>
                       </td>
@@ -284,7 +305,7 @@ export default function TestResultsClient({
                           <div className="mb-2 text-xs bg-purple-50 border border-purple-200 p-2 rounded-sm">
                             <span className="font-semibold text-purple-700">AI Reasoning: </span>
                             <span className="text-purple-800">{ev.ai_reasoning}</span>
-                            <span className="ml-2 text-purple-500">(confidence: {Math.round((ev.ai_confidence || 0) * 100)}%)</span>
+                            <span className="ml-2 text-purple-500">(confidence: {Math.min(100, Math.round((ev.ai_confidence || 0) * 100))}%)</span>
                           </div>
                         )}
                         {ev.manual_feedback && (

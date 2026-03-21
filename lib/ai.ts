@@ -12,7 +12,7 @@ async function ask(prompt: string): Promise<string> {
   if (!key) throw new Error("GEMINI_API_KEY not set");
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${key}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
     {
       method: "POST",
       headers: {

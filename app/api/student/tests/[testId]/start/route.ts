@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export async function POST(req: Request, { params }: { params: { testId: string } }) {
   const s = await auth();
   const u = s?.user as any;
@@ -22,10 +31,12 @@ export async function POST(req: Request, { params }: { params: { testId: string 
     where: { testId_userId: { testId: params.testId, userId: u.id } },
   });
   const allowMultiple = (test.settings as any)?.allow_multiple_attempts;
+  const shouldRandomize = (test.settings as any)?.randomize_questions === true;
 
   if (existing) {
     if (existing.status === "IN_PROGRESS") {
-      const safeQs = test.questions.map(({ correctOption: _c, keywords: _k, modelAnswer: _m, ...q }) => q);
+      let safeQs = test.questions.map(({ correctOption: _c, keywords: _k, modelAnswer: _m, ...q }) => q);
+      if (shouldRandomize) safeQs = shuffleArray(safeQs);
       return NextResponse.json({
         attemptId: existing.id,
         questions: safeQs,
@@ -43,7 +54,8 @@ export async function POST(req: Request, { params }: { params: { testId: string 
     data: { testId: params.testId, userId: u.id, maxScore },
   });
 
-  const safeQs = test.questions.map(({ correctOption: _c, keywords: _k, modelAnswer: _m, ...q }) => q);
+  let safeQs = test.questions.map(({ correctOption: _c, keywords: _k, modelAnswer: _m, ...q }) => q);
+  if (shouldRandomize) safeQs = shuffleArray(safeQs);
   return NextResponse.json({
     attemptId: attempt.id,
     questions: safeQs,

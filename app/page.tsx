@@ -5,7 +5,7 @@ import { ArrowRight, FileText, Clock, Cpu, BarChart3, CheckCircle2 } from "lucid
 
 export default async function Home() {
   const session = await auth();
-  if (session) {
+  if (session?.user) {
     const role = (session.user as any).role;
     if (role === "SUPER_ADMIN") redirect("/admin");
     if (role === "TEACHER") redirect("/teacher");

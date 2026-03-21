@@ -7,7 +7,9 @@ node_modules/
 .next/
 out/
 build/
-
+DEPLOY.md
+DOCUMENTATION.md
+README.md
 # Environment
 .env
 .env.local

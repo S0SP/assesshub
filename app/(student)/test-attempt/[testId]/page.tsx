@@ -122,9 +122,10 @@ export default function TestAttemptPage() {
       });
       const data = await res.json();
       if (res.ok) {
+        const showResults = attemptData.test?.settings?.show_results_immediately !== false;
         toast.info("⏱ Time's up! Test submitted automatically.");
         sessionStorage.removeItem(`attempt-${testId}`);
-        setTimeout(() => router.push(`/results/${attemptData.attemptId}`), 2000);
+        setTimeout(() => router.push(showResults ? `/results/${attemptData.attemptId}` : `/dashboard`), 2000);
       } else {
         toast.error(data.error || "Auto-submit failed");
       }
@@ -142,9 +143,10 @@ export default function TestAttemptPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success(`Submitted! Score: ${Math.round(data.percentage)}%`);
+        const showResults = attemptData.test?.settings?.show_results_immediately !== false;
+        toast.success(showResults ? `Submitted! Score: ${Math.round(data.percentage)}%` : "Test submitted! Results will be available after review.");
         sessionStorage.removeItem(`attempt-${testId}`);
-        router.push(`/results/${attemptData.attemptId}`);
+        router.push(showResults ? `/results/${attemptData.attemptId}` : `/dashboard`);
       } else {
         toast.error(data.error || "Submission failed");
       }

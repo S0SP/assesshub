@@ -7,10 +7,39 @@ function getClient() {
 }
 
 async function ask(prompt: string): Promise<string> {
-  const client = getClient();
-  const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
-  const result = await model.generateContent(prompt);
-  return result.response.text().trim();
+  const key = process.env.GEMINI_API_KEY;
+
+  if (!key) throw new Error("GEMINI_API_KEY not set");
+
+  // Changed from gemini-1.5-flash (deprecated) to gemini-2.5-flash (current)
+  // Changed v1beta to v1 for long-term stability
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${key}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [{ text: prompt }],
+          },
+        ],
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.text();
+    console.error("Gemini API Error:", err);
+    throw new Error(`Gemini request failed: ${res.status}`);
+  }
+
+  const data = await res.json();
+
+  // Updated optional chaining to safely extract the text response
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 }
 
 function parseJSON<T>(text: string, fallback: T): T {

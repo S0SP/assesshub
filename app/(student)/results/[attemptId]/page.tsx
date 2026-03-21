@@ -12,6 +12,32 @@ export default async function ResultPage({ params }: { params: { attemptId: stri
     include: { test: { include: { questions: { orderBy: { order: "asc" } } } }, user: { select: { id: true } } },
   });
   if (!attempt || attempt.userId !== (session.user as any).id) redirect("/dashboard");
+
+  // Gate: if show_results_immediately is OFF, block access
+  const showResults = (attempt.test.settings as any)?.show_results_immediately !== false;
+  if (!showResults) {
+    return (
+      <div className="min-h-screen bg-[#F7F7F5]">
+        <header className="bg-white border-b border-[#E0DFDB]">
+          <div className="max-w-4xl mx-auto px-6 h-14 flex items-center gap-4">
+            <Link href="/dashboard" className="text-[#5C5C59] hover:text-[#111110]"><ArrowLeft className="w-4 h-4" strokeWidth={1.5}/></Link>
+            <span className="font-heading font-semibold text-sm text-[#111110]">Results</span>
+          </div>
+        </header>
+        <main className="max-w-4xl mx-auto px-6 py-16 text-center">
+          <div className="bg-white border border-[#E0DFDB] p-10 max-w-md mx-auto">
+            <div className="w-14 h-14 bg-amber-50 border border-amber-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+            </div>
+            <h1 className="font-heading text-lg font-bold text-[#111110] mb-2">Results Pending Review</h1>
+            <p className="text-sm text-[#5C5C59] mb-6">Your test has been submitted successfully. Results will be available after your teacher reviews the submissions.</p>
+            <Link href="/dashboard" className="btn-primary inline-flex items-center gap-2"><ArrowLeft className="w-4 h-4" strokeWidth={1.5}/>Back to Dashboard</Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   const { test, evaluation } = attempt as any;
   const ev: Record<string, any> = evaluation || {};
   const questions = test.questions;

@@ -307,8 +307,8 @@ export default function TestCreateClient({ test: existingTest }: { test?: any })
                   {[["allow_multiple_attempts","Allow multiple attempts"],["show_results_immediately","Show results after submission"],["randomize_questions","Randomize question order"],["negative_marking","Enable negative marking for MCQs"],["ai_grading","AI-assisted subjective grading (Gemini)"]].map(([k,l])=>(
                     <div key={k} className="flex items-center justify-between">
                       <span className="text-sm text-[#111110]">{l}</span>
-                      <button onClick={()=>setSettings(s=>({...s,[k]:!s[k as keyof typeof s]}))} className={`w-10 h-5 rounded-full transition-colors duration-200 relative ${settings[k as keyof typeof settings]?"bg-[#1A2E44]":"bg-[#E0DFDB]"}`}>
-                        <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${settings[k as keyof typeof settings]?"translate-x-5":"translate-x-0.5"}`}/>
+                      <button onClick={()=>setSettings(s=>({...s,[k]:!s[k as keyof typeof s]}))} className={`w-11 h-6 rounded-full transition-colors duration-200 relative overflow-hidden ${settings[k as keyof typeof settings]?"bg-[#1A2E44]":"bg-[#E0DFDB]"}`}>
+                        <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${settings[k as keyof typeof settings]?"translate-x-5":"translate-x-0"}`}/>
                       </button>
                     </div>
                   ))}

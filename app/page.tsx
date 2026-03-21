@@ -49,7 +49,7 @@ export default async function Home() {
         </p>
         <div className="flex items-center gap-4">
           <Link href="/register" className="inline-flex items-center gap-2 btn-primary px-8 py-3.5 text-base">
-            Create Free Account <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
+            Create Account <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
           </Link>
           <Link href="/login" className="btn-outline px-8 py-3.5 text-base">Sign In</Link>
         </div>
@@ -101,9 +101,9 @@ export default async function Home() {
       <section className="border-t border-[#E0DFDB] bg-[#1A2E44]">
         <div className="max-w-6xl mx-auto px-6 py-20 text-center">
           <h2 className="font-display text-4xl font-bold text-white mb-4">Ready to transform your assessments?</h2>
-          <p className="text-[#9BAFC4] mb-8 text-sm">Start creating tests in minutes. No credit card required.</p>
+          <p className="text-[#9BAFC4] mb-8 text-sm">Start creating tests in minutes.</p>
           <Link href="/register" className="inline-flex items-center gap-2 bg-white text-[#1A2E44] hover:bg-[#F7F7F5] px-8 py-3.5 text-sm font-medium transition-colors duration-150 rounded-sm">
-            Get Started Free <ArrowRight className="w-4 h-4" strokeWidth={1.5} />
+            Get Started<ArrowRight className="w-4 h-4" strokeWidth={1.5} />
           </Link>
         </div>
       </section>
@@ -114,7 +114,7 @@ export default async function Home() {
           <span className="font-heading font-bold text-sm text-[#1A2E44]">AssessHub</span>
           <div className="flex items-center gap-6">
             <span>Privacy</span><span>Terms</span>
-            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" strokeWidth={1.5} /> 2024 AssessHub</span>
+            <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" strokeWidth={1.5} /> 2026 AssessHub</span>
           </div>
         </div>
       </footer>

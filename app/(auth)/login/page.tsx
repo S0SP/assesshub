@@ -100,6 +100,8 @@ export default function LoginPage() {
           <div className="mt-6 p-4 bg-white border border-[#E0DFDB] rounded-sm text-xs text-[#5C5C59] space-y-1">
             <p className="font-medium text-[#111110] text-sm mb-2">Demo Credentials</p>
             <p>Admin: admin@assesshub.com / Admin@123</p>
+            <p>Student: taker@assesshub.com / Taker@123</p>
+            <p>Teacher: teacher@assesshub.com / Teacher@123</p>
           </div>
 
           <p className="mt-6 text-center text-sm text-[#5C5C59]">
